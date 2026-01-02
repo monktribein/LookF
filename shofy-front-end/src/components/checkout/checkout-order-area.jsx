@@ -26,6 +26,8 @@ const CheckoutOrderArea = ({ checkoutData }) => {
   // Disable submit only while submitting, or when card is selected but Stripe is not ready
   const isSubmitDisabled =
     isCheckoutSubmit || (showCard && (!stripe || !clientSecret));
+
+  const stripeEnabled = !!process.env.NEXT_PUBLIC_STRIPE_KEY;
   return (
     <div className="tp-checkout-place white-bg">
       <h3 className="tp-checkout-place-title">Your Order</h3>
@@ -115,43 +117,45 @@ const CheckoutOrderArea = ({ checkoutData }) => {
         </ul>
       </div>
       <div className="tp-checkout-payment">
-        <div className="tp-checkout-payment-item">
-          <input
-            {...register(`payment`, {
-              required: `Payment Option is required!`,
-            })}
-            type="radio"
-            id="back_transfer"
-            name="payment"
-            value="Card"
-          />
-          <label onClick={() => setShowCard(true)} htmlFor="back_transfer" data-bs-toggle="direct-bank-transfer">
-            Credit Card
-          </label>
-          {showCard && (
-            <div className="direct-bank-transfer">
-              <div className="payment_card">
-                <CardElement
-                  options={{
-                    style: {
-                      base: {
-                        fontSize: "16px",
-                        color: "#424770",
-                        "::placeholder": {
-                          color: "#aab7c4",
+        {stripeEnabled && (
+          <div className="tp-checkout-payment-item">
+            <input
+              {...register(`payment`, {
+                required: `Payment Option is required!`,
+              })}
+              type="radio"
+              id="back_transfer"
+              name="payment"
+              value="Card"
+            />
+            <label onClick={() => setShowCard(true)} htmlFor="back_transfer" data-bs-toggle="direct-bank-transfer">
+              Credit Card
+            </label>
+            {showCard && (
+              <div className="direct-bank-transfer">
+                <div className="payment_card">
+                  <CardElement
+                    options={{
+                      style: {
+                        base: {
+                          fontSize: "16px",
+                          color: "#424770",
+                          "::placeholder": {
+                            color: "#aab7c4",
+                          },
+                        },
+                        invalid: {
+                          color: "#9e2146",
                         },
                       },
-                      invalid: {
-                        color: "#9e2146",
-                      },
-                    },
-                  }}
-                />
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          )}
-          <ErrorMsg msg={errors?.payment?.message} />
-        </div>
+            )}
+            <ErrorMsg msg={errors?.payment?.message} />
+          </div>
+        )}
         <div className="tp-checkout-payment-item">
           <input
             {...register(`payment`, {

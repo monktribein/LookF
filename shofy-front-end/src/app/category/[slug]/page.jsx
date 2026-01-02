@@ -11,13 +11,22 @@ export const metadata = {
 
 export default async function CategoryListingPage({ params }) {
   const { slug } = await params;
-  const title = formatFromSlug(slug || "");
+  const raw = (slug || "").toString();
+  // Back-compat for old links like /category/mens
+  const canonicalSlug =
+    raw === "mens" ? "men" :
+    raw === "womens" ? "women" :
+    raw === "lookfame-juniors" ? "junior" :
+    raw === "juniors" ? "junior" :
+    raw;
+
+  const title = formatFromSlug(canonicalSlug || "");
 
   return (
     <Wrapper>
       <HeaderTwo style_2={true} />
       <ShopBreadcrumb title={title || "Category"} subtitle={title || "Category"} />
-      <ShopArea initialCategory={slug} />
+      <ShopArea initialCategory={canonicalSlug} />
       <Footer primary_style={true} />
     </Wrapper>
   );

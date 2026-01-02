@@ -6,11 +6,22 @@ export default function MobileNavbar() {
   const { data: categories } = useGetCategoriesQuery({ isActive: true });
   const items = categories?.data || [];
 
+  const buildHref = (cat) => {
+    const parent = (cat?.parent || "").toString().toLowerCase();
+    const slug = (cat?.slug || "").toString();
+    // If this item is a subcategory (has a parent + parentCategory), route to shop with subcategory filter.
+    if (parent && cat?.parentCategory) {
+      return `/shop?category=${encodeURIComponent(parent)}&subcategory=${encodeURIComponent(slug)}`;
+    }
+    // Otherwise treat it as a top-level category listing.
+    return `/category/${encodeURIComponent(slug)}`;
+  };
+
   return (
     <div className="bg-white py-6 w-full overflow-hidden">
       <div className="horizontal-scroll">
         {items.map((cat) => (
-          <Link key={cat._id} href={`/category/${cat.slug}`} className="category-item">
+          <Link key={cat._id} href={buildHref(cat)} className="category-item">
             <div className="category-pill">
               <span className="text-sm font-medium">{cat.name}</span>
             </div>

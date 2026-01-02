@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import menu_data from "@/data/menu-data";
 import { useGetCategoriesQuery } from "@/redux/features/categoryApi";
-import { slugify } from "@/utils/slugify";
+import { resolveNavbarCategoryFolder, slugify } from "@/utils/slugify";
 
 const groupKey = (g = "") => g.trim().toLowerCase();
 const parentKey = (p = "") => p.trim().toLowerCase();
@@ -36,11 +36,11 @@ const Menus = () => {
     console.warn("[menus] Failed to load categories from /api/categories");
   }
 
-  const buildCategoryHref = (parent, slug) =>
-    `/shop?category=${parentKey(parent)}&subcategory=${slugify(slug || "", {
-      lower: true,
-      strict: true,
-    })}`;
+  const buildCategoryHref = (parent, slugOrName) => {
+    const folderSlug = slugify(resolveNavbarCategoryFolder(slugOrName || ""));
+    // navCategory drives the frontend-only assets grid; category/subcategory remain for existing filters
+    return `/shop?category=${parentKey(parent)}&subcategory=${folderSlug}&navCategory=${folderSlug}`;
+  };
 
   const renderColumnItems = (parent, column, fallbackMenus = []) => {
     const pKey = parentKey(parent);
@@ -63,7 +63,7 @@ const Menus = () => {
 
     return fallbackMenus?.map((item, j) => (
       <li key={j}>
-        <Link href={buildCategoryHref(pKey, slugify(item.title, { lower: true }))}>
+        <Link href={buildCategoryHref(pKey, item.title)}>
           {item.title}
         </Link>
       </li>

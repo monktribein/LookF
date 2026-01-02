@@ -98,7 +98,7 @@ const ShopContent = ({all_products,products,otherProps,shop_right,hidden_sidebar
                             .map((item,i) => (
                               <div
                                 key={i}
-                                className="col-xl-5th col-lg-3 col-md-4 col-sm-6"
+                                className="col-12 col-md-6 col-lg-3"
                               >
                                 <ProductItem product={item} />
                               </div>

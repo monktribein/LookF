@@ -14,6 +14,53 @@
         @media #{$lg, $md, $sm, $xs}{
             overflow-x: scroll;
         }
+
+        // Mobile-first: make the cart table stack into readable "cards" and avoid horizontal scrolling
+        @media #{$sm, $xs}{
+            overflow-x: visible;
+
+            & table{
+                width: 100% !important;
+            }
+
+            & thead{
+                display: none;
+            }
+
+            & tbody,
+            & tr,
+            & td{
+                display: block;
+                width: 100%;
+            }
+
+            & tr{
+                padding: 12px 12px 10px;
+                border-radius: 8px;
+            }
+
+            & td{
+                padding: 10px 0;
+                box-shadow: none;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+
+                &::before{
+                    content: attr(data-label);
+                    font-weight: 500;
+                    font-size: 14px;
+                    color: var(--tp-common-black);
+                    flex: 0 0 auto;
+                    max-width: 40%;
+                }
+
+                &[data-label=""]::before{
+                    display: none;
+                }
+            }
+        }
         .table > :not(caption) > * > * {
             padding: 20px 0;
             box-shadow: none;
@@ -21,8 +68,11 @@
         }
 
         & table{
-            @media #{$lg, $md, $sm, $xs}{
+            @media #{$lg, $md}{
                 width: 840px;
+            }
+            @media #{$sm, $xs}{
+                width: 100%;
             }
         }
 

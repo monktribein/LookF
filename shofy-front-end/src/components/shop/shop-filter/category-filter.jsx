@@ -4,13 +4,13 @@ import { useRouter,useSearchParams, usePathname } from "next/navigation";
 import { useDispatch } from "react-redux";
 // internal
 import ErrorMsg from "@/components/common/error-msg";
-import { useGetShowCategoryQuery } from "@/redux/features/categoryApi";
+import { useGetCategoriesQuery } from "@/redux/features/categoryApi";
 import { handleFilterSidebarClose } from "@/redux/features/shop-filter-slice";
 import ShopCategoryLoader from "@/components/loader/shop/shop-category-loader";
 import { slugify } from "@/utils/slugify";
 
 const CategoryFilter = ({setCurrPage,shop_right=false}) => {
-  const { data: categories, isLoading, isError } = useGetShowCategoryQuery();
+  const { data: categories, isLoading, isError } = useGetCategoriesQuery({ isActive: true });
   const router = useRouter();
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -36,24 +36,30 @@ const CategoryFilter = ({setCurrPage,shop_right=false}) => {
   if (!isLoading && isError) {
     content = <ErrorMsg msg="There was an error" />;
   }
-  if (!isLoading && !isError && categories?.result?.length === 0) {
+  const categoryList = categories?.data || [];
+  if (!isLoading && !isError && categoryList.length === 0) {
     content = <ErrorMsg msg="No Category found!" />;
   }
-  if (!isLoading && !isError && categories?.result?.length > 0) {
-    const category_items = categories.result;
-    content = category_items.map((item) => (
-      <li key={item._id}>
+  if (!isLoading && !isError && categoryList.length > 0) {
+    // Keep UI intact: list parent categories with a count when available.
+    // The API returns raw categories; we group by `parent` and count occurrences as a stable fallback.
+    const countsByParent = categoryList.reduce((acc, item) => {
+      const p = item?.parent;
+      if (!p) return acc;
+      acc[p] = (acc[p] || 0) + 1;
+      return acc;
+    }, {});
+
+    const parentNames = Object.keys(countsByParent).sort((a, b) => a.localeCompare(b));
+
+    content = parentNames.map((parent) => (
+      <li key={parent}>
         <a
-          onClick={() => handleCategoryRoute(item.parent)}
+          onClick={() => handleCategoryRoute(parent)}
           style={{ cursor: "pointer" }}
-          className={
-            activeCategorySlug ===
-            slugify(item.parent)
-              ? "active"
-              : ""
-          }
+          className={activeCategorySlug === slugify(parent) ? "active" : ""}
         >
-          {item.parent} <span>{item.products.length}</span>
+          {parent} <span>{countsByParent[parent]}</span>
         </a>
       </li>
     ));

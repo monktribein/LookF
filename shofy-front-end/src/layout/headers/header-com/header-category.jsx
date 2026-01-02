@@ -15,7 +15,9 @@ const HeaderCategory = ({ isCategoryActive, categoryType = "men" }) => {
 
   // handle category route
   const handleCategoryRoute = (slug) => {
-    router.push(`/category/${slug}`);
+    const parent = (categoryType || "").toLowerCase();
+    // These are sub-categories under a parent (men/women/etc). Use subcategory filter so products load.
+    router.push(`/shop?category=${encodeURIComponent(parent)}&subcategory=${encodeURIComponent(slug)}`);
   };
   // decide what to render
   let content = null;

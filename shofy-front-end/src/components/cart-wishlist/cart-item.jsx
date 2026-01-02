@@ -52,21 +52,21 @@ const CartItem = ({ product }) => {
   return (
     <tr>
       {/* img */}
-      <td className="tp-cart-img">
+      <td className="tp-cart-img" data-label="">
         <Link href={`/product-details/${_id}`}>
           <Image src={displayImg} alt={title || "product img"} width={70} height={100} />
         </Link>
       </td>
       {/* title */}
-      <td className="tp-cart-title">
+      <td className="tp-cart-title" data-label="Product">
         <Link href={`/product-details/${_id}`}>{title}</Link>
       </td>
       {/* price */}
-      <td className="tp-cart-price">
+      <td className="tp-cart-price" data-label="Price">
         <span>₹{(price * orderQuantity).toFixed(2)}</span>
       </td>
       {/* quantity */}
-      <td className="tp-cart-quantity">
+      <td className="tp-cart-quantity" data-label="Quantity">
         <div className="tp-product-quantity mt-10 mb-10">
           <span onClick={() => handleDecrement(product)} className="tp-cart-minus">
             <Minus />
@@ -78,7 +78,7 @@ const CartItem = ({ product }) => {
         </div>
       </td>
       {/* action */}
-      <td className="tp-cart-action">
+      <td className="tp-cart-action" data-label="">
         <button onClick={() => handleRemovePrd({ title, id: _id })} className="tp-cart-action-btn">
           <Close />
           <span> Remove</span>
@@ -89,6 +89,7 @@ const CartItem = ({ product }) => {
 };
 
 export default CartItem;
+
 
 
 

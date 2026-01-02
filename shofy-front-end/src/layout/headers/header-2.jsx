@@ -100,14 +100,14 @@ const HeaderTwo = ({ style_2 = false }) => {
                       </Link>
                     </div>
                   </div>
-                  <div className="col-xl-6 d-none d-xl-block">
+                  <div className="col-xl-6 col-lg-5 d-none d-lg-block">
                     <div className="main-menu menu-style-2">
                       <nav className="tp-main-menu-content">
                         <Menus />
                       </nav>
                     </div>
                   </div>
-                  <div className="col-xl-4 col-lg-6 col-md-4 col-sm-6 col-6">
+                  <div className="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-6">
                     <div className="tp-header-bottom-right d-flex align-items-center justify-content-end pl-30">
                       <div className="tp-header-search-2 d-none d-sm-block">
                         <form onSubmit={handleSubmit}>
@@ -153,7 +153,7 @@ const HeaderTwo = ({ style_2 = false }) => {
                             </span>
                           </button>
                         </div>
-                        <div className="tp-header-action-item tp-header-hamburger mr-20 d-xl-none">
+                        <div className="tp-header-action-item tp-header-hamburger mr-20 d-lg-none">
                           <button
                             onClick={() => setIsCanvasOpen(true)}
                             type="button"
@@ -173,7 +173,7 @@ const HeaderTwo = ({ style_2 = false }) => {
         {/* show only on mobile screens */}
         
         {pathname === "/" && (
-          <div className="d-xl-none">
+          <div className="d-lg-none">
             <MobileNavbar />
           </div>
         )}

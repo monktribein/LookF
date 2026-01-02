@@ -14,13 +14,20 @@ const toTitle = (value = "") =>
     .map((v) => v.charAt(0).toUpperCase() + v.slice(1))
     .join(" ");
 
-export default function ShopPageClient({ initialCategory, hidden_sidebar = false, shop_right = false }) {
+export default function ShopPageClient({
+  initialCategory,
+  hidden_sidebar = false,
+  shop_right = false,
+  assetCategorySlug = null,
+  assetImages = null,
+}) {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
-  const subCategoryParam = searchParams.get("subCategory");
+  const subCategoryParam = searchParams.get("subCategory") || searchParams.get("subcategory");
+  const navCategoryParam = searchParams.get("navCategory");
 
   const rawTitle =
-    categoryParam || subCategoryParam || initialCategory || "Shop Grid";
+    navCategoryParam || categoryParam || subCategoryParam || initialCategory || "Shop Grid";
   const titleText = rawTitle.toLowerCase() === "shop grid" ? "Shop Grid" : `${toTitle(rawTitle)} Shop`;
   const isCustomized = (categoryParam || "").toLowerCase() === "customized-tops";
 
@@ -35,6 +42,8 @@ export default function ShopPageClient({ initialCategory, hidden_sidebar = false
           initialCategory={initialCategory}
           hidden_sidebar={hidden_sidebar}
           shop_right={shop_right}
+          assetCategorySlug={assetCategorySlug}
+          assetImages={assetImages}
         />
       )}
       <Footer primary_style={true} />

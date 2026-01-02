@@ -6,8 +6,9 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
-// stripePromise
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY);
+// Stripe is optional in dev; avoid throwing if key is missing.
+const stripeKey = process.env.NEXT_PUBLIC_STRIPE_KEY;
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 const Providers = ({ children }) => {
   return (

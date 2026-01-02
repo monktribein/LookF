@@ -8,3 +8,15 @@
 @import 'node_modules/react-modal-video/scss/modal-video.scss';
 @import '../../public/assets/scss/main.scss';
 
+/* Prevent accidental horizontal scrolling on small screens */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+#wrapper {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+

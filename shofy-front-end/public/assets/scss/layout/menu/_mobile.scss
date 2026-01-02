@@ -81,63 +81,66 @@
             position: relative;
             width: 100%;
             padding: 0;
-            padding-left: 20px;
-            padding-right: 20px;
+            padding-left: 16px;
+            padding-right: 16px;
             
+            // Separator should be consistent even when the item is a wrapper (Link + toggle button)
             &:not(:last-child){
-                & a{
-                    border-bottom: 1px solid rgba($color: $black, $alpha: .1);
-                }
+                border-bottom: 1px solid rgba($color: $black, $alpha: .1);
             }
             &.has-dropdown{
-                & > a{
-                    & .dropdown-toggle-btn{
-                        position: absolute;
-                        right: 0;
-                        top: 50%;
-                        @extend %translateY1_2;
-                        font-size: 16px;
-                        color: #7F8387;
-                        @extend %tp-ff-fontawesome;
-                        @extend %tp-transition;
-                        z-index: 1;
-                        width: 30px;
-                        height: 30px;
-                        line-height: 28px;
-                        text-align: center;
-                        border: 1px solid rgba($color: $black, $alpha: .12);
-                        @include tp-transition-mul((background-color .3s ease-in-out, border-color .3s ease-in-out, color .3s ease-in-out));
-                        & i{
-                            @extend %tp-transition;
-                        }
-                        &.dropdown-opened{
-                            & i{
-                                @include transform(rotate(90deg));
-                            }
-                        }
-                        &:hover{
-                            background-color: var(--tp-theme-primary);
-                            border-color: var(--tp-theme-primary);
-                            color: var(--tp-common-white);
-                            & i{
-                                color: var(--tp-common-white);
-                            }
-                        }
-                    }
+                // New structure: Link + toggle button wrapper (behaves like desktop)
+                & .tp-mobile-link-wrap{
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 10px 0;
+                    padding-right: 42px; // room for toggle button
                     &.expanded{
-                        color: var(--tp-theme-primary);
-    
-                        & .dropdown-toggle-btn.dropdown-opened{
-                            background-color: var(--tp-theme-primary);
-                            border-color: var(--tp-theme-primary);
-                            color: var(--tp-common-white);
-                            & i{
-                                color: var(--tp-common-white);
-                            }
+                        & .tp-mobile-link{
+                            color: var(--tp-theme-primary);
                         }
                     }
-    
-                    
+                }
+                & .tp-mobile-link{
+                    display: block;
+                    width: 100%;
+                    font-size: 16px;
+                    color: var(--tp-common-black);
+                }
+                & .dropdown-toggle-btn{
+                    position: absolute;
+                    right: 0;
+                    top: 50%;
+                    @extend %translateY1_2;
+                    font-size: 16px;
+                    color: #7F8387;
+                    @extend %tp-ff-fontawesome;
+                    @extend %tp-transition;
+                    z-index: 1;
+                    width: 34px;
+                    height: 34px;
+                    line-height: 32px;
+                    text-align: center;
+                    border: 1px solid rgba($color: $black, $alpha: .12);
+                    @include tp-transition-mul((background-color .3s ease-in-out, border-color .3s ease-in-out, color .3s ease-in-out));
+                    & i{
+                        @extend %tp-transition;
+                    }
+                    &.dropdown-opened{
+                        & i{
+                            @include transform(rotate(90deg));
+                        }
+                    }
+                    &:hover{
+                        background-color: var(--tp-theme-primary);
+                        border-color: var(--tp-theme-primary);
+                        color: var(--tp-common-white);
+                        & i{
+                            color: var(--tp-common-white);
+                        }
+                    }
                 }
                 &:hover{
                     & > a{
@@ -194,37 +197,37 @@
                 & li{
                     padding: 0;
 					& a{
-                        margin-left: auto;
-						width: 93%;
-						padding: 10px 5%;
+                        margin-left: 0;
+						width: 100%;
+						padding: 10px 0;
+                        padding-left: 14px;
 						text-shadow: none !important;
 						visibility: visible;
-                        padding-left: 0;
-                        padding-right: 20px;
+                        padding-right: 0;
 					}
 
 					& li{
 						& a{
-							width: 88%;
-							padding: 10px 7%;
-                            padding-left: 0;
-                            padding-right: 20px;
+							width: 100%;
+							padding: 10px 0;
+                            padding-left: 24px;
+                            padding-right: 0;
 						}
 
 						& li{
 							& a{
-								width: 83%;
-								padding: 10px 9%;
-                                padding-left: 0;
-                                padding-right: 20px;
+								width: 100%;
+								padding: 10px 0;
+                                padding-left: 34px;
+                                padding-right: 0;
 							}
 
 							& li{
 								& a{
-									width: 68%;
-									padding: 10px 11%;
-                                    padding-left: 0;
-                                    padding-right: 20px;
+									width: 100%;
+									padding: 10px 0;
+                                    padding-left: 44px;
+                                    padding-right: 0;
 								}
 							}
 						}

@@ -40,67 +40,31 @@ const getSubCategory = (product = {}) =>
   (product.subCategory || "").toLowerCase();
 const getParent = (product = {}) => (product.parent || "").toLowerCase();
 const getChild = (product = {}) => (product.children || "").toLowerCase();
-const isNewArrival = (product = {}) => product.isNewArrival === true;
-
-const TrendingProducts = () => {
-  const imageOverrideMap = {
-    trousers:
-      "https://xcdn.next.co.uk/COMMON/Items/Default/Default/ItemImages/AltItemZoom/317892s.jpg",
-    "oversized t-shirts":
-      "https://i.pinimg.com/originals/bf/80/51/bf80515a5be6282c6128312ac4691d83.jpg",
-    cargos:
-      "https://cdn.shopify.com/s/files/1/0588/2203/3585/products/5010YKWHITE_1.jpg?v=1629198756&width=940",
-    cosmetics:
-      "https://img.freepik.com/premium-photo/professional-makeup-products-makeup_972405-1627.jpg",
-    accessories:
-      "https://www.checkcharm.com/wp-content/uploads/2024/04/image-265.png",
-    "full sleeve shirt - classic white":
-      "https://www.studiosuits.com/cdn/shop/files/whitecottonshirtlk_1445x.jpg?v=1698385632",
-    "casual shorts - khaki":
-      "https://m.media-amazon.com/images/I/41QCeJzhL-L.jpg",
-    "boxers - cotton pack navy":
-      "https://savys.pk/cdn/shop/files/men-cotton-boxer-587701.png?v=1745098410&width=1000",
-    "denim jeans - dark wash":
-      "https://tse3.mm.bing.net/th/id/OIP.iDTGVM3-q1aRGcMnjpoLggAAAA?rs=1&pid=ImgDetMain&o=7&rm=3",
-    "denim jeans - light wash":
-      "https://peppermayo.co.uk/cdn/shop/files/BackAgainStraightLegDenimJeansLightWashBlue4.jpg?v=1749598102",
-    "casual shorts - navy":
-      "https://www.careofcarl.com/bilder/artiklar/zoom/24233311r_3.jpg?m=1678800351",
-    "flat front trousers - navy":
-      "https://d3n4hccmbcfj87.cloudfront.net/uploads/2017/08/4PEP1.jpg",
-    "boxers - cotton pack grey":
-      "https://www.cottontraders.com/dw/image/v2/BCDM_PRD/on/demandware.static/-/Sites-cotton-master-catalog/default/dweb0d79c0/images/original/AJ10592W_original_neutral_charcoal_278091.jpg?sw=549",
-  };
-
-  const getOverrideImg = (category = "", title = "") => {
-    if (typeof category !== "string") return null;
-    const cat = category.toLowerCase();
-    const ttl = typeof title === "string" ? title.toLowerCase() : "";
-    if (ttl.includes("casual shorts - khaki"))
-      return imageOverrideMap["casual shorts - khaki"];
-    if (ttl.includes("boxers - cotton pack navy"))
-      return imageOverrideMap["boxers - cotton pack navy"];
-    if (ttl.includes("boxers - cotton pack grey"))
-      return imageOverrideMap["boxers - cotton pack grey"];
-    if (ttl.includes("denim jeans - dark wash"))
-      return imageOverrideMap["denim jeans - dark wash"];
-    if (ttl.includes("denim jeans - light wash"))
-      return imageOverrideMap["denim jeans - light wash"];
-    if (ttl.includes("casual shorts - navy"))
-      return imageOverrideMap["casual shorts - navy"];
-    if (ttl.includes("flat front trousers - navy"))
-      return imageOverrideMap["flat front trousers - navy"];
-    if (ttl.includes("full sleeve shirt - classic white"))
-      return imageOverrideMap["full sleeve shirt - classic white"];
-    if (cat.includes("trouser") || cat.includes("pant"))
-      return imageOverrideMap["trousers"];
-    if (cat.includes("oversized")) return imageOverrideMap["oversized t-shirts"];
-    if (cat.includes("cargo")) return imageOverrideMap["cargos"];
-    if (cat.includes("cosmetic") || cat.includes("beauty"))
-      return imageOverrideMap["cosmetics"];
-    if (cat.includes("accessor")) return imageOverrideMap["accessories"];
-    return null;
-  };
+const navCategoryFromImg = (src = "") => {
+  const s = String(src || "");
+  if (s.includes("/Men/trousers/")) return "trousers";
+  if (s.includes("/Men/cargo%20pant/") || s.includes("/Men/cargo pant/"))
+    return "cargo-pants";
+  if (s.includes("/Men/cargo%20jogger/") || s.includes("/Men/cargo jogger/"))
+    return "cargo-joggers";
+  if (s.includes("/Men/Polo%20T-shirt/") || s.includes("/Men/Polo T-shirt/"))
+    return "polo-tshirts";
+  if (s.includes("/Men/full%20sleeve%20t-shirt/") || s.includes("/Men/full sleeve t-shirt/"))
+    return "full-sleeve-tshirts";
+  if (s.includes("/Men/over%20sized%20t-shirt/") || s.includes("/Men/over sized t-shirt/"))
+    return "oversized-tshirts";
+  if (s.includes("/Men/regular%20fit%20t-shirt/") || s.includes("/Men/regular fit t-shirt/"))
+    return "regular-fit-t-shirt";
+  if (s.includes("/Men/T-shirt/")) return "tshirts";
+  if (s.includes("/Men/casual%20shirt/") || s.includes("/Men/casual shirt/"))
+    return "casual-shirts";
+  if (s.includes("/Men/checked%20formal%20shirt/") || s.includes("/Men/checked formal shirt/"))
+    return "checked-formal-shirts";
+  if (s.includes("/Men/Flora%20shirt/") || s.includes("/Men/Flora shirt/"))
+    return "floral-shirts";
+  return "";
+};
+const TrendingProducts = ({ assetImages = [], assetImagesByTab = null }) => {
 
   const {
     data: products,
@@ -122,27 +86,74 @@ const TrendingProducts = () => {
   let content = null;
 
   if (isLoading) content = <HomeTwoNewPrdPrdLoader loading={isLoading} />;
-  if (!isLoading && isError) content = <ErrorMsg msg="There was an error" />;
-  if (!isLoading && !isError && products?.data?.length === 0)
+  const hasAssetFallback = Array.isArray(assetImages) && assetImages.length > 0;
+  const apiItems = products?.data || [];
+  const hasApiItems = Array.isArray(apiItems) && apiItems.length > 0;
+
+  if (!isLoading && isError && !hasAssetFallback) content = <ErrorMsg msg="There was an error" />;
+  if (!isLoading && !isError && !hasApiItems && !hasAssetFallback)
     content = <ErrorMsg msg="No Products found!" />;
 
-  if (!isLoading && !isError && products?.data?.length > 0) {
-    const arrivals = products.data.filter((p) => isNewArrival(p));
+  const hasAssetTabs =
+    assetImagesByTab && typeof assetImagesByTab === "object";
+
+  const PRICE_BY_TAB = {
+    "View All": 599,
+    Shirts: 899,
+    Trousers: 1099,
+    "T-shirts": 599,
+    "Polo T-shirts": 799,
+  };
+
+  if (!isLoading && (( !isError && hasApiItems) || hasAssetFallback)) {
+    // Prefer API items; otherwise render local static assets as a fallback.
+    const arrivals = hasApiItems ? apiItems : [];
 
     const getItemsForCategory = (cat) => {
+      // If API has no items, but we have tab->images, use that directly (ensures filtering always works)
+      if (!hasApiItems && hasAssetTabs) {
+        const images = assetImagesByTab?.[cat] || [];
+        const price = PRICE_BY_TAB[cat] ?? PRICE_BY_TAB["View All"];
+        return images
+          .slice(0, categoryLimits[cat] ?? images.length)
+          .map((src, idx) => {
+            const navCategory = navCategoryFromImg(src) || slugify(cat);
+            return {
+              _id: `asset-new-${slugify(cat)}-${idx}`,
+              img: src,
+              title: cat === "View All" ? "New Arrival" : cat,
+              tags: [],
+              price,
+              reviews: [],
+              discount: 0,
+              status: "active",
+              href: navCategory ? `/shop?navCategory=${navCategory}` : "/shop",
+            };
+          });
+      }
+
       let pool = arrivals;
       if (cat === "View All") return pool;
+      // More forgiving matching so pills work even if API uses tshirts vs t-shirts, polo-tshirts vs polo-t-shirts, etc.
       const target = slugify(cat);
+      const targetAlts = new Set([target]);
+      if (target === "t-shirts") {
+        targetAlts.add("tshirts");
+        targetAlts.add("tshirt");
+        targetAlts.add("t-shirt");
+      }
+      if (target === "polo-t-shirts") {
+        targetAlts.add("polo-tshirts");
+        targetAlts.add("polo");
+      }
       pool = pool.filter((p) => {
         const main = getMainCategory(p);
         const sub = getSubCategory(p);
         const parent = getParent(p);
         const child = getChild(p);
+        const candidates = [main, sub, parent, child].map((v) => slugify(v));
         return (
-          slugify(main) === target ||
-          slugify(sub) === target ||
-          slugify(parent) === target ||
-          slugify(child) === target
+          candidates.some((c) => targetAlts.has(c))
         );
       });
       const limit = categoryLimits[cat] ?? pool.length;
@@ -178,10 +189,14 @@ const TrendingProducts = () => {
         `}</style>
 
         <div className="tp-trending-grid">
-          {filteredItems.map((item) => {
-            const label = normalizeCategory(item);
-            const overrideImg = getOverrideImg(label, item.title);
-            const cardProduct = overrideImg ? { ...item, img: overrideImg } : item;
+          {filteredItems.map((item, idx) => {
+            // Prefer per-item image (important for correct tab filtering).
+            const localImg =
+              item?.img ||
+              (Array.isArray(assetImages) && assetImages.length
+                ? assetImages[idx % assetImages.length]
+                : null);
+            const cardProduct = localImg ? { ...item, img: localImg } : item;
             return (
               <div key={item._id} className="tp-trending-item">
                 <ProductItem product={cardProduct} style_2={true} />

@@ -14,6 +14,12 @@ export const metadata = {
   },
 }
 
+// Ensure true mobile responsiveness (Bootstrap + Tailwind breakpoints depend on this)
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 
 
 const body = Jost({

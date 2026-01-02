@@ -14,7 +14,7 @@ import 'swiper/css/scrollbar';
 // Tabs
 const tabs = ["All Collection", "Shirts", "T-Shirts", "Polo T-Shirts", "Trousers"];
 
-const ProductArea = () => {
+const ProductArea = ({ assetImagesByTab = null }) => {
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const { data: products, isError, isLoading } = useGetProductTypeQuery({
     type: 'fashion',
@@ -64,17 +64,6 @@ const ProductArea = () => {
       .filter((p) => !!p.img); // skip entries without a primary image
   }, [products]);
 
-  const tabCounts = useMemo(() => {
-    const byTab = {
-      "All Collection": normalizedFavorites.length,
-      Shirts: normalizedFavorites.filter((p) => p.mainCategory === 'shirts').length,
-      "T-Shirts": normalizedFavorites.filter((p) => p.mainCategory === 'tshirts').length,
-      "Polo T-Shirts": normalizedFavorites.filter((p) => p.subCategory === 'polo-tshirts').length,
-      Trousers: normalizedFavorites.filter((p) => p.subCategory === 'trousers').length,
-    };
-    return byTab;
-  }, [normalizedFavorites]);
-
   const display_items = useMemo(() => {
     switch (activeTab) {
       case 'Shirts':
@@ -90,33 +79,95 @@ const ProductArea = () => {
     }
   }, [activeTab, normalizedFavorites]);
 
-  // Map customer favorites to public/assets/Popular images (cycle through)
-  const popularImages = [
-    "/assets/Popular/img%201.jpg",
-    "/assets/Popular/img%202.jpg",
-    "/assets/Popular/img%203.jpg",
-    "/assets/Popular/img%204.jpg",
-    "/assets/Popular/img%206.jpg",
-    "/assets/Popular/img%207.jpg",
-    "/assets/Popular/img%208.jpg",
-    "/assets/Popular/img%209.jpg",
-  ];
+  const activeAssetImages = useMemo(() => {
+    if (!assetImagesByTab) return [];
+    return assetImagesByTab?.[activeTab] || [];
+  }, [assetImagesByTab, activeTab]);
+
+  const tabCounts = useMemo(() => {
+    if (assetImagesByTab) {
+      return tabs.reduce((acc, t) => {
+        acc[t] = (assetImagesByTab?.[t] || []).length;
+        return acc;
+      }, {});
+    }
+    const byTab = {
+      "All Collection": normalizedFavorites.length,
+      Shirts: normalizedFavorites.filter((p) => p.mainCategory === 'shirts').length,
+      "T-Shirts": normalizedFavorites.filter((p) => p.mainCategory === 'tshirts').length,
+      "Polo T-Shirts": normalizedFavorites.filter((p) => p.subCategory === 'polo-tshirts').length,
+      Trousers: normalizedFavorites.filter((p) => p.subCategory === 'trousers').length,
+    };
+    return byTab;
+  }, [assetImagesByTab, normalizedFavorites]);
 
   const display_with_images = useMemo(() => {
+    // If we have local assets for this tab, render those (even if API returns no products)
+    if (assetImagesByTab) {
+      return activeAssetImages.map((src, idx) => ({
+        _id: `asset-${activeTab}-${idx}`,
+        img: src,
+        title: activeTab,
+        tags: [],
+        price: activeTab === "Trousers" ? 1099 : activeTab === "Polo T-Shirts" ? 799 : 599,
+        reviews: [],
+        discount: 0,
+        status: "active",
+        href: (() => {
+          const s = String(src || "");
+          if (s.includes("/Men/trousers/")) return "/shop?navCategory=trousers";
+          if (s.includes("/Men/cargo%20pant/") || s.includes("/Men/cargo pant/")) return "/shop?navCategory=cargo-pants";
+          if (s.includes("/Men/cargo%20jogger/") || s.includes("/Men/cargo jogger/")) return "/shop?navCategory=cargo-joggers";
+          if (s.includes("/Men/Polo%20T-shirt/") || s.includes("/Men/Polo T-shirt/")) return "/shop?navCategory=polo-tshirts";
+          if (s.includes("/Men/full%20sleeve%20t-shirt/") || s.includes("/Men/full sleeve t-shirt/")) return "/shop?navCategory=full-sleeve-tshirts";
+          if (s.includes("/Men/over%20sized%20t-shirt/") || s.includes("/Men/over sized t-shirt/")) return "/shop?navCategory=oversized-tshirts";
+          if (s.includes("/Men/regular%20fit%20t-shirt/") || s.includes("/Men/regular fit t-shirt/")) return "/shop?navCategory=regular-fit-t-shirt";
+          if (s.includes("/Men/T-shirt/")) return "/shop?navCategory=tshirts";
+          if (s.includes("/Men/casual%20shirt/") || s.includes("/Men/casual shirt/")) return "/shop?navCategory=casual-shirts";
+          if (s.includes("/Men/checked%20formal%20shirt/") || s.includes("/Men/checked formal shirt/")) return "/shop?navCategory=checked-formal-shirts";
+          if (s.includes("/Men/Flora%20shirt/") || s.includes("/Men/Flora shirt/")) return "/shop?navCategory=floral-shirts";
+          return "/shop";
+        })(),
+      }));
+    }
+
+    // Otherwise, keep existing API behavior (but ensure images are local-only)
+    const fallbackLocalImages = (assetImagesByTab?.["All Collection"] || []).length
+      ? assetImagesByTab["All Collection"]
+      : [
+          "/assets/Popular/img%201.jpg",
+          "/assets/Popular/img%202.jpg",
+          "/assets/Popular/img%203.jpg",
+          "/assets/Popular/img%204.jpg",
+          "/assets/Popular/img%206.jpg",
+          "/assets/Popular/img%207.jpg",
+          "/assets/Popular/img%208.jpg",
+          "/assets/Popular/img%209.jpg",
+        ];
+
     if (!display_items || display_items.length === 0) return [];
     return display_items.map((item, idx) => ({
       ...item,
-      img: popularImages[idx % popularImages.length] || item.img,
+      img: fallbackLocalImages[idx % fallbackLocalImages.length] || item.img,
     }));
-  }, [display_items]);
+  }, [assetImagesByTab, activeAssetImages, activeTab, display_items]);
 
   // Decide what to render
   let content = null;
-  if (isLoading) content = <HomeTwoPrdLoader loading={isLoading} />;
-  else if (!isLoading && isError) content = <ErrorMsg msg="There was an error" />;
-  else if (!isLoading && !isError && normalizedFavorites.length === 0)
-    content = <ErrorMsg msg="No Products found!" />;
-  else if (!isLoading && !isError && normalizedFavorites.length > 0) {
+  if (!assetImagesByTab) {
+    if (isLoading) content = <HomeTwoPrdLoader loading={isLoading} />;
+    else if (!isLoading && isError) content = <ErrorMsg msg="There was an error" />;
+    else if (!isLoading && !isError && normalizedFavorites.length === 0)
+      content = <ErrorMsg msg="No Products found!" />;
+  }
+
+  if (assetImagesByTab) {
+    if (activeAssetImages.length === 0) {
+      content = <ErrorMsg msg="No items found" />;
+    }
+  }
+
+  if (!content) {
     content = (
       <div className="row justify-center m-50">
         <div className="col-xl-12">
@@ -159,7 +210,7 @@ const ProductArea = () => {
         {content}
 
         {/* Swiper only if products exist */}
-        {display_items.length > 0 && (
+        {display_with_images.length > 0 && (
           <>
             <style>{`
               /* Adjust slides on mobile for proper spacing */

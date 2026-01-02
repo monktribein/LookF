@@ -21,12 +21,12 @@ const menu_data = [
         title: 'TSHIRTS',
         link: '/shop',
         mega_menus: [
-          { title: 'Plain T-shirts', link: '/shop' },
-          { title: 'Printed T-shirts', link: '/shop' },
-          { title: 'Regular Fit T-shirt', link: '/shop' },
-          { title: 'Polo T-shirts', link: '/shop' },
-          { title: 'Full Sleeve Tshirts', link: '/shop' },
-          { title: 'OverSized Tshirts', link: 'shop' },
+          { title: 'Plain T-shirts', link: `/shop?navCategory=${slugify('Plain T-shirts')}` },
+          { title: 'Printed T-shirts', link: `/shop?navCategory=${slugify('Printed T-shirts')}` },
+          { title: 'Regular Fit T-shirt', link: `/shop?navCategory=${slugify('Regular Fit T-shirt')}` },
+          { title: 'Polo T-shirts', link: `/shop?navCategory=${slugify('Polo T-shirts')}` },
+          { title: 'Full Sleeve Tshirts', link: `/shop?navCategory=${slugify('Full Sleeve Tshirts')}` },
+          { title: 'OverSized Tshirts', link: `/shop?navCategory=${slugify('OverSized Tshirts')}` },
         ]
       },
       {
@@ -45,8 +45,8 @@ const menu_data = [
         title: 'BOTTOM WEAR',
         link: '/shop',
         mega_menus: [
-          { title: 'Cargo Joggers', link: '/shop' },
-          { title: 'Cargo Pants', link: '/shop' },
+          { title: 'Cargo Joggers', link: `/shop?navCategory=${slugify('Cargo Joggers')}` },
+          { title: 'Cargo Pants', link: `/shop?navCategory=${slugify('Cargo Pants')}` },
           { title: 'Trousers', link: '/shop' },
           { title: 'Jeans', link: '/shop' },
           { title: 'Boxers', link: '/shop' },
@@ -351,7 +351,23 @@ const menu_data = [
 ]
 
 
-const mapCategoryLink = (title = "") => `/shop?category=${slugify(title)}`;
+const mapCategoryLink = (title = "") => {
+  const s = slugify(title || "");
+
+  // Normalize common mobile labels to the category keys the products API expects
+  // For top-level groups, match desktop behavior: go to Shop (all products) instead of applying a category filter
+  // (category-filtered endpoints vary by backend data shape and can return empty on some setups).
+  if (s === "mens" || s === "men") return "/shop";
+  if (s === "womens" || s === "women") return "/shop";
+  if (s === "lookfame-juniors" || s === "juniors" || s === "junior") return "/shop";
+  if (s === "accessories") return "/shop";
+
+  // Cosmetics naming varies; keep it consistent
+  if (s === "cosmetic" || s === "cosmetics") return "/shop";
+
+  // Default: keep existing behavior
+  return `/shop?category=${s}`;
+};
 
 const mappedMenu = menu_data.map((item) => {
   const clone = { ...item };

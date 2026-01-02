@@ -17,48 +17,50 @@ const MobileMenus = () => {
 
   return (
     <nav className="tp-main-menu-content">
-      {mobile_menu.map((menu) => (
-        <ul key={menu.id}>
-          {menu.sub_menu ? (
-            <li
-              className={`has-dropdown ${
-                isActiveMenu === menu.title ? "dropdown-opened" : ""
-              }`}
-            >
-              <a
-                className={`${
-                  isActiveMenu === menu.title ? "expanded" : ""
-                }`}
-              >
-                {menu.title}
-                <button
-                  onClick={() => handleOpenSubMenu(menu.title)}
-                  className={`dropdown-toggle-btn ${
-                    isActiveMenu === menu.title ? "dropdown-opened" : ""
+      <ul>
+        {mobile_menu.map((menu) => (
+          <li
+            key={menu.id}
+            className={`${menu.sub_menu ? "has-dropdown" : ""} ${
+              isActiveMenu === menu.title ? "dropdown-opened" : ""
+            }`}
+          >
+            {menu.sub_menu ? (
+              <>
+                <div
+                  className={`tp-mobile-link-wrap ${
+                    isActiveMenu === menu.title ? "expanded" : ""
                   }`}
                 >
-                  <i className="fa-regular fa-angle-right"></i>
-                </button>
-              </a>
-              <ul
-                className={`tp-submenu ${
-                  isActiveMenu === menu.title ? "active" : ""
-                }`}
-              >
-                {menu.sub_menus.map((sub, i) => (
-                  <li key={i}>
-                    <Link href={sub.link}>{sub.title}</Link>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ) : (
-            <li>
+                  <Link href={menu.link} className="tp-mobile-link">
+                    {menu.title}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenSubMenu(menu.title)}
+                    className={`dropdown-toggle-btn ${
+                      isActiveMenu === menu.title ? "dropdown-opened" : ""
+                    }`}
+                    aria-label={`Toggle ${menu.title} submenu`}
+                  >
+                    <i className="fa-regular fa-angle-right"></i>
+                  </button>
+                </div>
+
+                <ul className={`tp-submenu ${isActiveMenu === menu.title ? "active" : ""}`}>
+                  {menu.sub_menus.map((sub, i) => (
+                    <li key={i}>
+                      <Link href={sub.link}>{sub.title}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
               <Link href={menu.link}>{menu.title}</Link>
-            </li>
-          )}
-        </ul>
-      ))}
+            )}
+          </li>
+        ))}
+      </ul>
     </nav>
   );
 };

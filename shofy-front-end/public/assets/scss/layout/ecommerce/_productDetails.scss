@@ -644,8 +644,23 @@
     }
     &-additional-info{
         padding-top: 60px;
-        @media #{$xs}{
-            overflow-x: scroll;
+        // Avoid horizontal scroll on mobile: stack rows instead
+        @media #{$xs, $sm}{
+            overflow-x: visible;
+
+            & table{
+                width: 100%;
+            }
+
+            & table tr td{
+                display: block;
+                width: 100%;
+                padding: 10px 16px;
+            }
+
+            & table tr td:first-child{
+                width: 100%;
+            }
         }
         $add : &;
         &-title{

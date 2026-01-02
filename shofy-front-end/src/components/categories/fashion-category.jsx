@@ -28,7 +28,15 @@ const FashionCategory = () => {
 
   // handle category route
   const handleCategoryRoute = (title) => {
-    router.push(`/shop?category=${slugify(title)}`);
+    const slug = slugify(title);
+    // Keep homepage visuals the same, but route these specific cards to the assets-based grid
+    if (slug === "oversized-t-shirts" || slug === "oversized-t-shirt") {
+      return router.push(`/shop?navCategory=oversized-tshirts`);
+    }
+    if (slug === "cargos") {
+      return router.push(`/shop?navCategory=cargos`);
+    }
+    return router.push(`/shop?category=${slug}`);
   };
 
   // handle scroll navigation
@@ -78,6 +86,9 @@ const FashionCategory = () => {
       "bags and carriers": "https://baginning.com/media/catalog/product/cache/17f7930b9630993becbd36a7c8a76b30/j/d/jd565298963621_02.jpg",
       "headwear": "https://www.jeffreycampbell.com/cdn/shop/products/1_51766109-630d-4b60-9427-1392505d556b.jpg?v=1643790621&width=580",
     };
+
+    // Safety fallback (used only if an item is missing from imageMap)
+    const fallbackImgs = ["/assets/img/menu/menu-home-2.jpg"];
 
     content = curated.map((item, idx) => {
       const imgKey = item.name.toLowerCase();

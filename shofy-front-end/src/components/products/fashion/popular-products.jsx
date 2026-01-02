@@ -50,7 +50,7 @@ const slider_setting = {
   },
 };
 
-const PopularProducts = () => {
+const PopularProducts = ({ assetImages = [] }) => {
   const { data: products, isError, isLoading } =
     useGetPopularProductByTypeQuery("fashion");
 
@@ -83,26 +83,45 @@ const PopularProducts = () => {
 
   if (isLoading) content = <HomeTwoPopularPrdLoader loading={isLoading} />;
   if (!isLoading && isError) content = <ErrorMsg msg="There was an error" />;
-  if (!isLoading && !isError && products?.data?.length === 0)
+
+  const fallbackImages =
+    Array.isArray(assetImages) && assetImages.length
+      ? assetImages
+      : [
+          "/assets/Popular/img%201.jpg",
+          "/assets/Popular/img%202.jpg",
+          "/assets/Popular/img%203.jpg",
+          "/assets/Popular/img%204.jpg",
+          "/assets/Popular/img%206.jpg",
+          "/assets/Popular/img%207.jpg",
+          "/assets/Popular/img%208.jpg",
+          "/assets/Popular/img%209.jpg",
+        ];
+
+  const apiProducts = products?.data || [];
+
+  // If API has products, show them but force local images. If not, show asset-only cards from /assets/Popular.
+  const mappedProducts =
+    apiProducts.length > 0
+      ? apiProducts.map((prd, idx) => ({
+          ...prd,
+          img: fallbackImages[idx % fallbackImages.length] || prd.img,
+        }))
+      : fallbackImages.map((src, idx) => ({
+          _id: `asset-popular-${idx}`,
+          img: src,
+          title: "Customize T-Shirt",
+          tags: [],
+          price: 0,
+          reviews: [],
+          discount: 0,
+          status: "active",
+          href: "/shop?navCategory=tshirts",
+        }));
+
+  if (!isLoading && !isError && mappedProducts.length === 0) {
     content = <ErrorMsg msg="No Products found!" />;
-
-  if (!isLoading && !isError && products?.data?.length > 0) {
-    const popularImages = [
-      "/assets/Popular/img%201.jpg",
-      "/assets/Popular/img%202.jpg",
-      "/assets/Popular/img%203.jpg",
-      "/assets/Popular/img%204.jpg",
-      "/assets/Popular/img%206.jpg",
-      "/assets/Popular/img%207.jpg",
-      "/assets/Popular/img%208.jpg",
-      "/assets/Popular/img%209.jpg",
-    ];
-
-    const mappedProducts = products.data.map((prd, idx) => ({
-      ...prd,
-      img: popularImages[idx % popularImages.length] || prd.img,
-    }));
-
+  } else if (!isLoading && !isError && mappedProducts.length > 0) {
     // Mobile grid view
     if (isMobile) {
       content = (

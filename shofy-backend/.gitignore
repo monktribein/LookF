@@ -1,2 +1,8 @@
 node_modules
 .vercel
+
+# env files (never commit secrets)
+.env
+.env.*
+!.env.example
+!.env.sample

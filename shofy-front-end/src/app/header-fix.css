@@ -70,6 +70,26 @@
   }
 }
 
+/* Desktop (lg) adjustments so menu fits cleanly at ~1024px */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .main-menu.menu-style-2 > nav > ul > li {
+    margin-right: 12px !important;
+  }
+
+  .main-menu.menu-style-2 > nav > ul > li > a {
+    font-size: 13px !important;
+    padding: 16px 0 !important;
+  }
+
+  .tp-header-search-2 input {
+    max-width: 140px;
+  }
+
+  .tp-header-bottom-right {
+    gap: 10px;
+  }
+}
+
 @media (min-width: 1400px) {
   .main-menu.menu-style-2 > nav > ul > li {
     margin-right: 22px !important;
@@ -97,7 +117,7 @@
 }
 
 /* Fix for very small screens */
-@media (max-width: 1199px) {
+@media (max-width: 991px) {
   .main-menu.menu-style-2 {
     display: none;
   }
@@ -194,13 +214,4 @@
   visibility: visible !important;
   opacity: 1 !important;
   transform: translateY(0) !important;
-}
-
-/* TEMPORARY: Force Beauty dropdown to always be visible for debugging */
-.beauty-dropdown .beauty-submenu {
-  visibility: visible !important;
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-  background: red !important; /* Make it obvious */
-  border: 3px solid blue !important;
 }

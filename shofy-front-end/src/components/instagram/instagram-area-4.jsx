@@ -23,7 +23,7 @@ const InstagramAreaFour = () => {
   return (
     <>
       <section className="tp-instagram-area tp-instagram-style-4 pt-110 pb-10">
-        <div className="container-fluid pl-20 pr-20">
+        <div className="container-fluid px-4 sm:px-6 lg:px-20">
           <div className="row">
             <div className="col-xl-12">
               <div className="tp-section-title-wrapper-4 mb-50 text-center">

@@ -24,7 +24,7 @@ const CartArea = () => {
           {cart_products.length > 0 &&
             <div className="row">
               <div className="col-xl-9 col-lg-8">
-                <div className="tp-cart-list mb-25 mr-30">
+                <div className="tp-cart-list mb-25">
                   <div className="cartmini__shipping">
                     <RenderCartProgress />
                   </div>
@@ -60,7 +60,7 @@ const CartArea = () => {
                       </div> */}
                     </div>
                     <div className="col-xl-6 col-md-4">
-                      <div className="tp-cart-update text-md-end mr-30">
+                      <div className="tp-cart-update text-md-end">
                         <button onClick={() => dispatch(clearCart())} type="button" className="tp-cart-update-btn">Clear Cart</button>
                       </div>
                     </div>

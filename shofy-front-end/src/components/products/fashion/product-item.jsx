@@ -16,8 +16,23 @@ const ProductItem = ({ product, style_2 = false }) => {
   const [ratingVal, setRatingVal] = useState(0);
   const { cart_products } = useSelector((state) => state.cart);
   const { wishlist } = useSelector((state) => state.wishlist);
-  const isAddedToCart = cart_products.some((prd) => prd._id === _id);
-  const isAddedToWishlist = wishlist.some((prd) => prd._id === _id);
+
+  // Treat ONLY our generated "asset-" ids as asset-only.
+  // Everything else should behave like a normal product (add-to-cart, details, purchase) like before.
+  const isAssetProduct = typeof _id === "string" && _id.startsWith("asset-");
+
+  const detailsHref = isAssetProduct
+    ? typeof product?.href === "string" && product.href
+      ? product.href
+      : "/shop"
+    : `/product-details/${_id}`;
+
+  const isAddedToCart =
+    _id != null &&
+    cart_products.some((prd) => String(prd?._id) === String(_id));
+  const isAddedToWishlist =
+    _id != null &&
+    wishlist.some((prd) => String(prd?._id) === String(_id));
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -62,7 +77,7 @@ const ProductItem = ({ product, style_2 = false }) => {
             : { height: 240, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }
         }
       >
-        <Link href={`/product-details/${_id}`}>
+        <Link href={detailsHref}>
           {style_2 ? (
             <Image
               src={img}
@@ -87,58 +102,74 @@ const ProductItem = ({ product, style_2 = false }) => {
           {status === 'out-of-stock' && <span className="product-hot">out-stock</span>}
         </div>
         {/* product action */}
-        <div className="tp-product-action-2 tp-product-action-blackStyle">
-          <div className="tp-product-action-item-2 d-flex flex-column">
-            {isAddedToCart ? (
-              <Link
-                href="/cart"
-                className={`tp-product-action-btn-2 ${isAddedToCart ? 'active' : ''} tp-product-add-cart-btn`}
-              >
-                <Cart />
-                <span className="tp-product-tooltip tp-product-tooltip-right">
-                  View Cart
-                </span>
-              </Link>
-            ) : (
-              <button
-                type="button"
-                onClick={() => handleAddProduct(product)}
-                className={`tp-product-action-btn-2 ${isAddedToCart ? 'active' : ''} tp-product-add-cart-btn`}
-                disabled={status === 'out-of-stock'}
-              >
-                <Cart />
-                <span className="tp-product-tooltip tp-product-tooltip-right">
-                  Add to Cart
-                </span>
-              </button>
-            )}
-            <button
-              onClick={() => dispatch(handleProductModal(product))}
-              className="tp-product-action-btn-2 tp-product-quick-view-btn"
-            >
-              <QuickView />
-              <span className="tp-product-tooltip tp-product-tooltip-right">
-                Quick View
-              </span>
-            </button>
-            <button disabled={status === 'out-of-stock'} onClick={() => handleWishlistProduct(product)} className={`tp-product-action-btn-2 ${isAddedToWishlist ? 'active' : ''} tp-product-add-to-wishlist-btn`}>
-              <Wishlist />
-              <span className="tp-product-tooltip tp-product-tooltip-right">
-                Add To Wishlist
-              </span>
-            </button>
-            <button disabled={status === 'out-of-stock'} onClick={() => handleCompareProduct(product)} className="tp-product-action-btn-2 tp-product-add-to-compare-btn">
-              <CompareThree />
-              <span className="tp-product-tooltip tp-product-tooltip-right">
-                Add To Compare
-              </span>
-            </button>
+        {_id != null && (
+          <div className="tp-product-action-2 tp-product-action-blackStyle">
+            <div className="tp-product-action-item-2 d-flex flex-column">
+              {isAddedToCart ? (
+                <Link
+                  href="/cart"
+                  className={`tp-product-action-btn-2 ${isAddedToCart ? 'active' : ''} tp-product-add-cart-btn`}
+                >
+                  <Cart />
+                  <span className="tp-product-tooltip tp-product-tooltip-right">
+                    View Cart
+                  </span>
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleAddProduct(product)}
+                  className={`tp-product-action-btn-2 ${isAddedToCart ? 'active' : ''} tp-product-add-cart-btn`}
+                  disabled={status === 'out-of-stock'}
+                >
+                  <Cart />
+                  <span className="tp-product-tooltip tp-product-tooltip-right">
+                    Add to Cart
+                  </span>
+                </button>
+              )}
+
+              {/* Keep “before” behavior for real products; avoid broken quick actions for asset-only cards */}
+              {!isAssetProduct && (
+                <>
+                  <button
+                    onClick={() => dispatch(handleProductModal(product))}
+                    className="tp-product-action-btn-2 tp-product-quick-view-btn"
+                  >
+                    <QuickView />
+                    <span className="tp-product-tooltip tp-product-tooltip-right">
+                      Quick View
+                    </span>
+                  </button>
+                  <button
+                    disabled={status === 'out-of-stock'}
+                    onClick={() => handleWishlistProduct(product)}
+                    className={`tp-product-action-btn-2 ${isAddedToWishlist ? 'active' : ''} tp-product-add-to-wishlist-btn`}
+                  >
+                    <Wishlist />
+                    <span className="tp-product-tooltip tp-product-tooltip-right">
+                      Add To Wishlist
+                    </span>
+                  </button>
+                  <button
+                    disabled={status === 'out-of-stock'}
+                    onClick={() => handleCompareProduct(product)}
+                    className="tp-product-action-btn-2 tp-product-add-to-compare-btn"
+                  >
+                    <CompareThree />
+                    <span className="tp-product-tooltip tp-product-tooltip-right">
+                      Add To Compare
+                    </span>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
       <div className="tp-product-content-2 pt-15">
         <div className="tp-product-tag-2">
-          {tags.map((t, i) => (
+          {(tags || []).map((t, i) => (
             <span key={i}>
               {t}
               {i < tags.length - 1 && ","}
@@ -146,14 +177,14 @@ const ProductItem = ({ product, style_2 = false }) => {
           ))}
         </div>
         <h3 className="tp-product-title-2">
-          <Link href={`/product-details/${_id}`}>{title}</Link>
+          <Link href={detailsHref}>{title}</Link>
         </h3>
         <div className="tp-product-rating-icon tp-product-rating-icon-2">
           <Rating allowFraction size={16} initialValue={ratingVal} readonly={true} />
         </div>
         <div className="tp-product-price-wrapper-2">
           <span className="tp-product-price-2 new-price">
-            ₹{price.toFixed(2)}
+            ₹{Number(price || 0).toFixed(2)}
           </span>
         </div>
       </div>

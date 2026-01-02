@@ -19,7 +19,16 @@ const ProductDetailsArea = ({id="6431364df5a812bd37e765ac"}) => {
   if (!isLoading && !isError && product) {
     content = (
       <>
-        <ProductDetailsBreadcrumb category={product.categoryName || product.category} title={product.title} />
+        <ProductDetailsBreadcrumb
+          category={
+            product.categoryName ||
+            product.category?.name ||
+            product.category ||
+            product.mainCategory ||
+            ""
+          }
+          title={product.title}
+        />
         <ProductDetailsContent productItem={product} />
       </>
     );

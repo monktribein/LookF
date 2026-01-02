@@ -74,7 +74,7 @@ const ShopRightArea = ({
                             .map((item) => (
                               <div
                                 key={item._id}
-                                className="col-xl-5th col-lg-3 col-md-4 col-sm-6"
+                                className="col-12 col-md-6 col-lg-3"
                               >
                                 <ProductItem product={item} />
                               </div>

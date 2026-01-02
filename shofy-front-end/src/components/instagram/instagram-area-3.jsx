@@ -23,7 +23,7 @@ const InstagramAreaThree = () => {
   return (
     <>
       <section className="tp-instagram-area tp-instagram-style-3">
-        <div className="container-fluid pl-20 pr-20">
+        <div className="container-fluid px-4 sm:px-6 lg:px-20">
           <div className="row row-cols-lg-6 row-cols-sm-2 row-cols-1 gx-2 gy-2 gy-lg-0">
             {instagram_data.map((item) => (
               <div className="col" key={item.id}>

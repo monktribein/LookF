@@ -1,14 +1,23 @@
 'use client'
 import React, { useState,useEffect } from "react";
 import {useSearchParams} from 'next/navigation';
+import Image from "next/image";
 import ShopLoader from "../loader/shop/shop-loader";
 import ErrorMsg from "../common/error-msg";
 import ShopFilterOffCanvas from "../common/shop-filter-offcanvas";
 import { useGetAllProductsQuery } from "@/redux/features/productApi";
 import ShopContent from "./shop-content";
 import { slugify } from "@/utils/slugify";
+import ProductItem from "@/components/products/fashion/product-item";
 
-const ShopArea = ({shop_right=false,hidden_sidebar=false, initialCategory, initialSubCategory}) => {
+const ShopArea = ({
+  shop_right = false,
+  hidden_sidebar = false,
+  initialCategory,
+  initialSubCategory,
+  assetCategorySlug = null,
+  assetImages = null,
+}) => {
   const searchParams = useSearchParams();
   const parentParam = searchParams.get('parent');
   const categoryParam = searchParams.get('category');
@@ -23,12 +32,48 @@ const ShopArea = ({shop_right=false,hidden_sidebar=false, initialCategory, initi
   const subCategorySlug = slugify(subCategoryParam || initialSubCategory || "");
   const parentFilter = slugify(parentParam || "");
 
+  const isAssetMode = Array.isArray(assetImages);
+  const PRICE_BY_SLUG = {
+    tshirts: 599,
+    "plain-tshirts": 599,
+    "printed-tshirts": 599,
+    "regular-fit-t-shirt": 599,
+    "polo-tshirts": 799,
+    "full-sleeve-tshirts": 699,
+    "oversized-tshirts": 699,
+    trousers: 1099,
+    cargos: 999,
+    "cargo-joggers": 999,
+    "cargo-pants": 999,
+    "casual-shirts": 899,
+    "checked-formal-shirts": 999,
+    "floral-shirts": 899,
+  };
+  const prettyTitle = (slug = "") => {
+    const s = String(slug || "");
+    if (s === "tshirts") return "T-Shirts";
+    if (s === "polo-tshirts") return "Polo T-Shirts";
+    if (s === "full-sleeve-tshirts") return "Full Sleeve T-Shirts";
+    if (s === "oversized-tshirts") return "Oversized T-Shirts";
+    if (s === "regular-fit-t-shirt") return "Regular Fit T-Shirts";
+    if (s === "cargos") return "Cargos";
+    if (s === "cargo-joggers") return "Cargo Joggers";
+    if (s === "cargo-pants") return "Cargo Pants";
+    if (s === "casual-shirts") return "Casual Shirts";
+    if (s === "checked-formal-shirts") return "Checked Formal Shirts";
+    if (s === "floral-shirts") return "Floral Shirts";
+    if (s === "plain-tshirts") return "Plain T-Shirts";
+    if (s === "printed-tshirts") return "Printed T-Shirts";
+    if (s === "trousers") return "Trousers";
+    return s.replace(/-/g, " ");
+  };
+
   const { data: products, isError, isLoading } = useGetAllProductsQuery({
     category: categorySlug || undefined,
     subcategory: subCategorySlug || undefined,
     parent: parentFilter || undefined,
     status: "active",
-  });
+  }, { skip: isAssetMode });
   const [priceValue, setPriceValue] = useState([0, 0]);
   const [selectValue, setSelectValue] = useState("");
   const [currPage, setCurrPage] = useState(1);
@@ -67,6 +112,60 @@ const ShopArea = ({shop_right=false,hidden_sidebar=false, initialCategory, initi
   };
   // decide what to render
   let content = null;
+
+  if (isAssetMode) {
+    if (!assetImages || assetImages.length === 0) {
+      content = (
+        <div className="pb-80 text-center">
+          <h3>No items found</h3>
+        </div>
+      );
+    } else {
+      const title = prettyTitle(assetCategorySlug || "");
+      const price =
+        PRICE_BY_SLUG[assetCategorySlug] ??
+        PRICE_BY_SLUG[slugify(assetCategorySlug || "")] ??
+        599;
+      content = (
+        <section className="tp-shop-area pb-120">
+          <div className="container px-4 md:px-6 lg:px-8">
+            <div className="row">
+              <div className="col-xl-12 col-lg-12">
+                <div className="tp-shop-main-wrapper">
+                  <div className="tp-shop-items-wrapper tp-shop-item-primary">
+                    <div className="row">
+                      {assetImages.map((src, idx) => (
+                        <div
+                          key={src}
+                          className="col-12 col-md-6 col-lg-3"
+                        >
+                          <ProductItem
+                            product={{
+                              _id: `asset-shop-${assetCategorySlug || "cat"}-${idx}`,
+                              img: src,
+                              title,
+                              price,
+                              tags: [],
+                              status: "active",
+                              href: assetCategorySlug
+                                ? `/shop?navCategory=${assetCategorySlug}`
+                                : "/shop",
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    return <>{content}</>;
+  }
 
   if (isLoading) {
     content = <ShopLoader loading={isLoading}/>;
