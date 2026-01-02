@@ -64,6 +64,7 @@ const useCheckoutSubmit = () => {
   let couponRef = useRef("");
 
   useEffect(() => {
+    if (typeof window === "undefined" || typeof localStorage === "undefined") return;
     if (localStorage.getItem("couponInfo")) {
       const data = localStorage.getItem("couponInfo");
       const coupon = JSON.parse(data);
@@ -77,7 +78,9 @@ const useCheckoutSubmit = () => {
   useEffect(() => {
     if (minimumAmount - discountAmount > total || cart_products.length === 0) {
       setDiscountPercentage(0);
-      localStorage.removeItem("couponInfo");
+      if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+        localStorage.removeItem("couponInfo");
+      }
     }
   }, [minimumAmount, total, discountAmount, cart_products]);
 
@@ -247,8 +250,10 @@ const useCheckoutSubmit = () => {
       })
       .unwrap()
       .then(res => {
-        localStorage.removeItem("cart_products");
-        localStorage.removeItem("couponInfo");
+        if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+          localStorage.removeItem("cart_products");
+          localStorage.removeItem("couponInfo");
+        }
         setIsCheckoutSubmit(false);
         notifySuccess("Your Order Confirmed!");
         const orderId = res?.order?._id || res?.data?.order?._id;
@@ -298,7 +303,9 @@ const useCheckoutSubmit = () => {
           if(result?.error){
           }
           else {
-            localStorage.removeItem("couponInfo");
+            if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+              localStorage.removeItem("couponInfo");
+            }
             notifySuccess("Your Order Confirmed!");
             router.push(`/order/${result.data?.order?._id}`);
           }

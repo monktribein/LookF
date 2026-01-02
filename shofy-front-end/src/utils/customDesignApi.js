@@ -1,11 +1,17 @@
 // Save a custom design and return the customDesignId (future-ready)
-// Always use a full backend URL to avoid relative-path CORS issues.
-// 1) If NEXT_PUBLIC_API_URL is set, use it.
-// 2) Otherwise default to localhost:5000 (backend default).
-let API_BASE = "http://localhost:5000";
-if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_URL) {
-  API_BASE = process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
-}
+// NOTE: Must not call local dev hosts or run API calls during build/SSR.
+const getApiBase = () => {
+  const raw =
+    (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_BASE_URL) ||
+    "";
+  const base = String(raw).trim().replace(/\/$/, "");
+  if (!base) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_API_BASE_URL. Please set it to your backend base URL."
+    );
+  }
+  return base;
+};
 
 const parseJsonSafe = async (res) => {
   const text = await res.text();
@@ -37,6 +43,7 @@ export const saveCustomDesign = async (payload = {}) => {
     userId,
   };
 
+  const API_BASE = getApiBase();
   const res = await fetch(`${API_BASE}/api/custom-designs`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -50,6 +57,7 @@ export const saveCustomDesign = async (payload = {}) => {
 };
 
 export const fetchCustomDesign = async (id) => {
+  const API_BASE = getApiBase();
   const res = await fetch(`${API_BASE}/api/custom-designs/${id}`);
   const data = await parseJsonSafe(res);
   if (!res.ok || !data?.success) {

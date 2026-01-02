@@ -5,6 +5,7 @@ const useSticky = () => {
     const [sticky,setSticky] = useState(false);
 
     const stickyHeader = () => {
+        if (typeof window === "undefined" || typeof document === "undefined") return;
         const sc = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
         if (sc > 80) {
             setSticky(true);

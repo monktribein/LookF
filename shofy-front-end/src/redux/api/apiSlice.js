@@ -1,11 +1,22 @@
 import Cookies from "js-cookie";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+let warnedMissingApiBaseUrl = false;
+const apiBaseUrl =
+  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_BASE_URL) || "";
+
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+    baseUrl: apiBaseUrl || "",
     prepareHeaders: async (headers, { getState, endpoint }) => {
+      if (!apiBaseUrl && typeof window !== "undefined" && !warnedMissingApiBaseUrl) {
+        warnedMissingApiBaseUrl = true;
+        // Avoid crashing builds/SSR; just warn once on the client.
+        console.warn(
+          "Missing NEXT_PUBLIC_API_BASE_URL; API requests may fail. Set it in your environment."
+        );
+      }
       try {
         const userInfo = Cookies.get('userInfo');
         if (userInfo) {

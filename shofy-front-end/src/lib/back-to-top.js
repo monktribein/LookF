@@ -1,4 +1,5 @@
 export default function BackToTop(value) {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
   const result = document.querySelector(value);
   if (result) {
     document.addEventListener("scroll", () => {

@@ -1,4 +1,5 @@
 import ShopPageClient from "./ShopPageClient";
+import { Suspense } from "react";
 import path from "path";
 import fs from "fs/promises";
 import { resolveNavbarCategoryDirName, resolveNavbarCategoryFolder, slugify } from "@/utils/slugify";
@@ -82,6 +83,8 @@ export default async function ShopPage({ searchParams }) {
   const assetImages = navCategory ? await listCategoryImages(navCategory) : null;
 
   return (
-    <ShopPageClient assetCategorySlug={navCategory || null} assetImages={assetImages} />
+    <Suspense fallback={null}>
+      <ShopPageClient assetCategorySlug={navCategory || null} assetImages={assetImages} />
+    </Suspense>
   );
 }

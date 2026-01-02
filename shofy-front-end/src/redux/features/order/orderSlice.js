@@ -11,13 +11,16 @@ export const orderSlice = createSlice({
   reducers: {
     set_shipping: (state, { payload }) => {
       state.shipping_info = payload;
-      localStorage.setItem(
-        "shipping_info",
-        JSON.stringify(payload)
-      );
+      if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+        localStorage.setItem("shipping_info", JSON.stringify(payload));
+      }
     },
     get_shipping: (state, { payload }) => {
-      const data = localStorage.getItem('shipping_info');
+      if (typeof window === "undefined" || typeof localStorage === "undefined") {
+        state.shipping_info = {};
+        return;
+      }
+      const data = localStorage.getItem("shipping_info");
       if (data) {
         state.shipping_info = JSON.parse(data);
       } else {

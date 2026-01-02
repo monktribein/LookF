@@ -5,6 +5,7 @@ const Cookies = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (typeof window === "undefined" || typeof localStorage === "undefined") return;
     const consent = localStorage.getItem("lookfame_cookies");
     if (!consent) {
       setVisible(true);
@@ -12,12 +13,16 @@ const Cookies = () => {
   }, []);
 
   const acceptCookies = () => {
-    localStorage.setItem("lookfame_cookies", "accepted");
+    if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+      localStorage.setItem("lookfame_cookies", "accepted");
+    }
     setVisible(false);
   };
 
   const declineCookies = () => {
-    localStorage.setItem("lookfame_cookies", "declined");
+    if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+      localStorage.setItem("lookfame_cookies", "declined");
+    }
     setVisible(false);
   };
 

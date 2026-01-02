@@ -1,4 +1,5 @@
 import ShopPageClient from "../shop/ShopPageClient";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Shofy - Shop Hidden Sidebar Page",
@@ -6,6 +7,8 @@ export const metadata = {
 
 export default function ShopHiddenSidebarPage() {
   return (
-    <ShopPageClient hidden_sidebar={true} />
+    <Suspense fallback={null}>
+      <ShopPageClient hidden_sidebar={true} />
+    </Suspense>
   );
 }

@@ -1,3 +1,5 @@
+'use client';
+
 import BackToTop from "@/lib/back-to-top";
 import React, { useEffect } from "react";
 
