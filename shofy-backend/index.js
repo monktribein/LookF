@@ -189,7 +189,7 @@ const globalErrorHandler = require("./middleware/global-error-handler");
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
-  "https://look-f.vercel.app/"
+  "https://look-f.vercel.app"
 ];
 
 app.use(
