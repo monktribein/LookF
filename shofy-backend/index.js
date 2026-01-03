@@ -103,6 +103,7 @@ const allowedOrigins = [
   "http://localhost:3000",              
   // "https://look-fame-f.vercel.app",
   // "https://lookfame.in"
+  "https://look-f-7z4d.vercel.app/"
 ];
 
 app.use(cors({
