@@ -112,7 +112,7 @@ const PopularProducts = ({ assetImages = [] }) => {
           img: src,
           title: "Customize T-Shirt",
           tags: [],
-          price: 0,
+          price: 199,
           reviews: [],
           discount: 0,
           status: "active",
